@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>H1E 謎解き - ゲームクリア</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* ページ内のスタイルを調整（もし必要であれば） */
+      .container {
+        text-align: center;
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      #result-area {
+        background-color: #e8f5e9; /* 薄い緑色 */
+      }
+      .hidden {
+        display: none;
+      }
+      #end-game-button {
+        background-color: #00796b;
+        color: white;
+        padding: 10px 20px;
+        font-size: 1.2em;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <header><p id="user-info">[ニックネーム]さんのゲームクリア</p></header>
+
+    <main>
+      <h1>🎉 謎解きクリアおめでとうございます！ 🎉</h1>
+      <p>
+        すべての謎を解き終えました。最後に「結果表示とリセット」ボタンを押して、景品交換コードを取得し、ゲームデータをリセットしてください。
+      </p>
+
+      <div class="container">
+        <button id="end-game-button">結果表示とリセット</button>
+
+        <p id="status-message" style="margin-top: 20px; font-weight: bold"></p>
+
+        <div
+          id="result-area"
+          class="hidden"
+          style="
+            margin-top: 30px;
+            border: 2px solid #00796b;
+            padding: 15px;
+            border-radius: 8px;
+          "
+        >
+          <h2>表示完了！</h2>
+          <p>景品交換用コード（ローカル生成）：</p>
+          <div
+            style="
+              font-size: 1.5em;
+              font-weight: bold;
+              color: #d32f2f;
+              margin: 10px 0;
+            "
+          >
+            <span id="display-code">CODE-TEST</span>
+          </div>
+          <p>
+            このコードをスタッフに提示してください。ありがとうございました！
+          </p>
+          <button
+            onclick="window.location.href='index.html';"
+            style="margin-top: 15px"
+          >
+            最初に戻る
+          </button>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
+<script>
+  const statusElements = {
+    message: document.getElementById("status-message"),
+    displayCode: document.getElementById("display-code"),
+    resultArea: document.getElementById("result-area"),
+    endButton: document.getElementById("end-game-button"),
+  };
+  let currentNickname = "";
+
+  // 🚨 修正点1: ランダムに選ぶ景品交換用コードのリスト 🚨
+  const PRIZE_CODES = [
+    "7381592406",
+    "2946017385",
+    "5072381964",
+    "1635940827",
+    // 必要に応じてコードを追加してください。
+    // 例: "H1E-CODE-007", "H1E-CODE-008" など
+  ];
+  let finalPrizeCode = ""; // ランダムに選ばれたコードを格納
+
+  window.onload = function () {
+    currentNickname = sessionStorage.getItem("currentNickname");
+
+    if (!currentNickname) {
+      // エラーの場合、自動的に登録ページに戻る
+      alert("エラー: ユーザー情報が確認できません。登録ページに戻ります。");
+      window.location.href = "index.html";
+      return;
+    }
+
+    document.getElementById(
+      "user-info"
+    ).textContent = `${currentNickname}さんのゲームクリア`;
+
+    // 🚨 修正点2: ページロード時にランダムコードを決定 🚨
+    const randomIndex = Math.floor(Math.random() * PRIZE_CODES.length);
+    finalPrizeCode = PRIZE_CODES[randomIndex];
+
+    // デバッグ用: ページロード時にコンソールで確認
+    console.log(`割り当てられた景品コード: ${finalPrizeCode}`);
+
+    statusElements.endButton.addEventListener("click", showResultAndReset);
+  };
+
+  /**
+   * 結果を表示し、ローカル/セッションストレージを全てクリアする関数。
+   */
+  function showResultAndReset() {
+    // ボタンの多重クリック防止
+    statusElements.endButton.disabled = true;
+    statusElements.message.style.color = "gray";
+    statusElements.message.textContent = "結果を集計中...";
+
+    // 1. 結果表示
+    // 🚨 修正点3: ランダムに選ばれたコードを表示 🚨
+    statusElements.displayCode.textContent = finalPrizeCode;
+
+    statusElements.resultArea.classList.remove("hidden");
+    statusElements.message.style.color = "green";
+    statusElements.message.innerHTML = `集計完了！景品交換コードが表示されました。`;
+
+    // 2. 🚨 データの完全リセット 🚨
+    // localStorage: 謎のクリア状況 ('h1e_achievements') をクリア
+    localStorage.clear();
+    // sessionStorage: ニックネーム、各謎の答え、最終コードをクリア
+    sessionStorage.clear();
+  }
+</script>

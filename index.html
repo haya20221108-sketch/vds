@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>H1E 謎解き - 参加登録</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header><p>H1E 謎解き</p></header>
+
+    <main>
+      <h1>参加登録</h1>
+      <p>ニックネームと学年を登録してゲームを始めましょう。</p>
+
+      <div class="container">
+        <form id="registrationForm">
+          <div class="form-group">
+            <label for="nickname">ニックネーム (必須項目)</label>
+            <input
+              type="text"
+              id="nickname"
+              name="nickname"
+              required
+              maxlength="10"
+            />
+          </div>
+          <div class="form-group">
+            <label for="grade">学年(必須項目)</label>
+            <select id="grade" name="grade" required>
+              <option value="" disabled selected>選択してください</option>
+              <option value="小学生">小学生</option>
+              <option value="中学1年生">中学1年生</option>
+              <option value="中学2年生">中学2年生</option>
+              <option value="中学3年生">中学3年生</option>
+              <option value="高校1年生">高校1年生</option>
+              <option value="高校2年生">高校2年生</option>
+              <option value="高校3年生">高校3年生</option>
+              <option value="大学生以上">大学生以上</option>
+            </select>
+          </div>
+          <button type="submit" id="registerButton">謎解きにすすむ</button>
+        </form>
+        <p id="statusMessage" style="margin-top: 15px; font-weight: bold"></p>
+      </div>
+    </main>
+
+    <script>
+      const NEXT_PAGE_URL = "location_check.html"; // 次のページ
+
+      const registrationForm = document.getElementById("registrationForm");
+      const nicknameInput = document.getElementById("nickname");
+      const gradeSelect = document.getElementById("grade");
+      const registerButton = document.getElementById("registerButton");
+      const statusMessage = document.getElementById("statusMessage");
+
+      window.onload = () => (statusMessage.textContent = "");
+
+      registrationForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const nickname = nicknameInput.value.trim();
+        const gradeValue = gradeSelect.value;
+
+        if (nickname === "" || gradeValue === "") {
+          statusMessage.style.color = "red";
+          statusMessage.textContent = "ニックネームと学年を選択してください。";
+          return;
+        }
+
+        registerButton.disabled = true;
+        statusMessage.style.color = "gray";
+        statusMessage.textContent = "登録中..."; // 送信処理は削除
+
+        // 🚨 データを一切送信せず、ローカルに保存してページ遷移 🚨
+        sessionStorage.setItem("currentNickname", nickname);
+        localStorage.setItem("userGrade", gradeValue); // 学年もローカルに保存
+
+        statusMessage.style.color = "green";
+        statusMessage.textContent = `登録完了！${nickname}さん、謎解きスタート！`;
+
+        setTimeout(() => {
+          window.location.href = NEXT_PAGE_URL;
+        }, 1000);
+
+        registerButton.disabled = false;
+      });
+    </script>
+  </body>
+</html>
